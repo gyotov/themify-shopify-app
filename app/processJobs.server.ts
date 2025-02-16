@@ -1,9 +1,14 @@
 import prisma from "./db.server";
 import { log } from "./utils/helpers";
+import { unauthenticated } from "./shopify.server";
+import publishTheme from "./api/publishTheme";
 
-export default async function() {
+export default async function () {
   log("Checking scheduled jobs queue...");
 
+  const { admin } = await unauthenticated.admin(
+    "describe-perception.myshopify.com",
+  );
   const currentTickNowDate = new Date();
   const jobs = await prisma.scheduledJob.findMany({
     where: {
@@ -17,9 +22,16 @@ export default async function() {
 
     try {
       if (job.jobName === "schedule_theme_publish") {
-        log(`Publishing theme with Shopify ID: ${job.shopifyThemeId}`);
-        // To Do:
-        // Handle Shopify themes API call here
+        log(`Publishing theme with Shopify ID: ${job.shopifyThemeId}...`);
+
+        const themePublish = await publishTheme(
+          admin.graphql,
+          job.shopifyThemeId,
+        );
+
+        if (themePublish.error) {
+          throw new Error(themePublish.error);
+        }
       }
 
       await prisma.scheduledJob.delete({
