@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "fa6c814e12bffe8eceeb67cd804ad815"
+name = "Themify: Theme scheduler"
+handle = "themify-theme-scheduler"
+application_url = "https://nd-bat-cancelled-man.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "describe-perception.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_themes"
+
+[auth]
+redirect_urls = [
+  "https://nd-bat-cancelled-man.trycloudflare.com/auth/callback",
+  "https://nd-bat-cancelled-man.trycloudflare.com/auth/shopify/callback",
+  "https://nd-bat-cancelled-man.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2025-01"
+
+[pos]
+embedded = false
