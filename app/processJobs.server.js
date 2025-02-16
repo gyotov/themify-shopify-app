@@ -1,9 +1,7 @@
-import prisma from "./app/db.server.js";
-import { log } from "./app/utils/helpers.js";
+import prisma from "./db.server";
+import { log } from "./utils/helpers";
 
-log(`Launching jobs queue with process PID: ${process.pid}`);
-
-export default async function processJobs() {
+export default async function() {
   log("Checking scheduled jobs queue...");
 
   const currentTickNowDate = new Date();
@@ -34,6 +32,3 @@ export default async function processJobs() {
     }
   }
 }
-
-// Run the job processor every minute
-setInterval(processJobs, 60 * 1000);

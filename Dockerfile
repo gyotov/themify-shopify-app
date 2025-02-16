@@ -18,4 +18,4 @@ COPY . .
 
 RUN npm run build
 
-CMD ["sh", "-c", "node jobProcessor.js & npm run docker-start"]
+CMD ["npm", "run", "docker-start"]
