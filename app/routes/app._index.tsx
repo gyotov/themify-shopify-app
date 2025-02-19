@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher, useLoaderData, redirect } from "@remix-run/react";
+import {
+  useFetcher,
+  useLoaderData,
+  redirect,
+  useRevalidator,
+} from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -274,12 +279,14 @@ const BannerAnnounceFreePlan = ({ hasActivePayment }) => {
 };
 
 export default function Index() {
+  const revalidator = useRevalidator();
   const fetcher = useFetcher<typeof action>();
   const data = useLoaderData();
   const shopify = useAppBridge();
   const [theme, setTheme] = useState("");
   const [date, setDate] = useState("");
   const [hour, setHour] = useState("");
+  const [refreshInterval] = useState(5000);
 
   const onThemeSchedule = (theme) => {
     setTheme(theme);
@@ -310,6 +317,16 @@ export default function Index() {
 
     shopify.modal.hide("app-schedule-modal");
   };
+
+  useEffect(() => {
+    if (refreshInterval && refreshInterval > 0) {
+      const interval = setInterval(() => {
+        revalidator.revalidate();
+      }, refreshInterval);
+
+      return () => clearInterval(interval);
+    }
+  }, [refreshInterval, revalidator]);
 
   return (
     <>
