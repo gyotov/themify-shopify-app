@@ -95,6 +95,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return {
         ...node,
         scheduleStatus: record ? record.status : null,
+        executeAt: record ? record.executeAt : null,
       };
     }),
     shop,
@@ -161,7 +162,7 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
       items={data.themes}
       resourceName={resourceName}
       renderItem={(item) => {
-        const { id, name, role, processing } = item;
+        const { id, name, role, processing, executeAt } = item;
         const isLive = role === "MAIN";
         const isScheduled = item.scheduleStatus === "PENDING";
 
@@ -177,15 +178,21 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
                     {isLive ? "Live" : "Draft"}
                   </Badge>
 
-                  <BlockStack align="center" gap="200">
+                  <BlockStack align="center" gap="100">
                     <Text
-                      variant="headingMd"
+                      variant="bodyLg"
                       fontWeight="bold"
                       as="h3"
                       tone="base"
                     >
                       {name}
                     </Text>
+
+                    {executeAt && (
+                      <Text tone="subdued" variant="bodySm" as="span">
+                        Publish on: <br /> {new Date(executeAt).toUTCString()}
+                      </Text>
+                    )}
                   </BlockStack>
                 </InlineStack>
 
