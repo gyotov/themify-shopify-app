@@ -41,10 +41,13 @@ export default async function processJobs() {
 
       log(`Job ${job.jobName} with ID ${job.id} completed.`);
     } catch (error) {
-      console.error(`Error executing job ${job.id}:`, error);
+      console.error(`Error executing job ${job.id}:`, error.message);
     }
   }
 }
+
+// Check for pending jobs
+processJobs();
 
 // Run the job processor every minute
 setInterval(processJobs, 60 * 1000);
