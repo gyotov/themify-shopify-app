@@ -13,6 +13,7 @@
     "start:queue": "node processJobs.js",
     "docker-start": "npm run setup && concurrently \"npm run start:queue\" \"npm run start\"",
     "setup": "prisma generate && prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "shopify": "shopify",
     "prisma": "prisma",
