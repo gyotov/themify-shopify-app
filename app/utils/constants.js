@@ -1,0 +1,1 @@
+export const FREE_PLAN_SCHEDULE_LIMIT = 3;

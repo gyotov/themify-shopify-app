@@ -26,18 +26,21 @@ import {
   Box,
   Select,
 } from "@shopify/polaris";
+import { LockIcon } from "@shopify/polaris-icons";
 import { Modal, TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import emptyStateThemesImage from "../images/emptystate-themes.png";
 import scheduleJob from "../db/scheduleJob";
 import getThemesByIds from "../db/getThemesByIds";
 import deleteScheduleJobByShopifyThemeId from "../db/deleteScheduleJobByShopifyThemeId";
+import getSessionById from "../db/getSessionById";
 import {
   hours,
   convertOffsetMinutesToHours,
   getCurrentDate,
   getDateYearAhead,
 } from "../utils/helpers";
+import { FREE_PLAN_SCHEDULE_LIMIT } from "../utils/constants";
 
 const PAGE_LIMIT = 10;
 
@@ -45,7 +48,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const endCursor = url.searchParams.get("endCursor");
   const startCursor = url.searchParams.get("startCursor");
-  const { admin, billing } = await authenticate.admin(request);
+  const { admin, billing, session } = await authenticate.admin(request);
   const payments = await billing.check({
     isTest: process.env.NODE_ENV !== "production",
   });
@@ -85,6 +88,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   } = await response.json();
 
   const records = await getThemesByIds(themes.nodes.map((node) => node.id));
+  const sessionRecord = await getSessionById(session.id);
 
   return {
     themes: themes.nodes.map((node) => {
@@ -101,6 +105,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     shop,
     pageInfo: themes.pageInfo,
     hasActivePayment: payments.hasActivePayment,
+    scheduleCount: sessionRecord?.scheduleCount,
   };
 };
 
@@ -118,6 +123,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await deleteScheduleJobByShopifyThemeId(shopifyThemeId);
 
       return null;
+    }
+
+    const sessionRecord = await getSessionById(session.id);
+
+    if (sessionRecord?.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT) {
+      return { error: "Schedule limit reached." };
     }
 
     const scheduledJobData = await scheduleJob(
@@ -165,6 +176,9 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
         const { id, name, role, processing, executeAt } = item;
         const isLive = role === "MAIN";
         const isScheduled = item.scheduleStatus === "PENDING";
+        const locked =
+          data.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT &&
+          !data.hasActivePayment;
 
         return (
           <ResourceItem id={id} disabled>
@@ -203,8 +217,9 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
                   {!isScheduled && (
                     <Button
                       variant="plain"
-                      disabled={isLive || processing}
+                      disabled={isLive || processing || locked}
                       onClick={() => onThemeScheduleHandler(item)}
+                      icon={locked ? LockIcon : undefined}
                     >
                       Schedule
                     </Button>

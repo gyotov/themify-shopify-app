@@ -30,6 +30,7 @@ model Session {
   collaborator  Boolean?       @default(false)
   emailVerified Boolean?       @default(false)
   scheduledJobs ScheduledJob[]
+  scheduleCount Int            @default(0)
 }
 
 model ScheduledJob {
