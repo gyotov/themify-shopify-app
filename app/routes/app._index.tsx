@@ -110,13 +110,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, billing } = await authenticate.admin(request);
   const formData = await request.formData();
   const endCursor = formData.get("endCursor");
   const startCursor = formData.get("startCursor");
   const shopifyThemeId = formData.get("shopifyThemeId");
   const utcIsoDate = formData.get("utcIsoDate");
   const unschedule = formData.get("unschedule");
+  const payments = await billing.check({
+    isTest: process.env.NODE_ENV !== "production",
+  });
 
   if (shopifyThemeId) {
     if (unschedule) {
@@ -127,7 +130,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     const sessionRecord = await getSessionById(session.id);
 
-    if (sessionRecord?.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT) {
+    if (
+      sessionRecord?.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT &&
+      !payments.hasActivePayment
+    ) {
       return { error: "Schedule limit reached." };
     }
 
@@ -434,6 +440,44 @@ export default function Index() {
                   data={data}
                   onThemeSchedule={onThemeSchedule}
                 />
+              </Card>
+            </Layout.Section>
+
+            <Layout.Section variant="oneThird">
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="p" variant="headingMd">
+                    Plan & Scheduling Info
+                  </Text>
+
+                  <Text as="p" variant="bodyMd">
+                    {"Current plan: "}
+                    <Text as="strong" variant="headingSm">
+                      {data.hasActivePayment ? "Pro" : "Free"}
+                    </Text>
+                  </Text>
+
+                  <Text as="p" variant="bodyMd">
+                    {"Performed schedules: "}
+                    <Text as="strong" variant="headingSm">
+                      {data.scheduleCount}
+                    </Text>
+                  </Text>
+
+                  <Text as="p" variant="bodyMd">
+                    {"Available schedules: "}
+                    <Text as="strong" variant="headingSm">
+                      {data.hasActivePayment
+                        ? "Unlimited"
+                        : FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount}
+                    </Text>
+                  </Text>
+
+                  <Text as="p" variant="bodyMd">
+                    Upgrade to unlock unlimited scheduling.{" "}
+                    <Link url="/app/billing">Upgrade</Link>
+                  </Text>
+                </BlockStack>
               </Card>
             </Layout.Section>
 
