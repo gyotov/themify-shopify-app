@@ -46,8 +46,30 @@ export default async function processJobs() {
   }
 }
 
-// Check for pending jobs
-processJobs();
+async function waitForNextInterval() {
+  const now = new Date();
+  const minutes = now.getMinutes();
+  const nextRunMinutes = Math.ceil(minutes / 5) * 5;
 
-// Run the job processor every minute
-setInterval(processJobs, 60 * 1000);
+  if (minutes % 5 === 0) {
+    log("Starting immediately at a 5-minute mark...");
+  } else {
+    const waitTime =
+      ((nextRunMinutes - minutes) % 60) * 60 * 1000 -
+      now.getSeconds() * 1000 -
+      now.getMilliseconds();
+
+    log(`Waiting ${waitTime / 1000} seconds until the next 5-minute mark...`);
+    await new Promise((resolve) => setTimeout(resolve, waitTime));
+  }
+}
+
+async function startScheduler() {
+  await waitForNextInterval();
+
+  processJobs();
+  setInterval(processJobs, 5 * 60 * 1000); // Run every 5 minutes
+}
+
+processJobs();
+startScheduler();
