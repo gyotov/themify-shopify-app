@@ -25,6 +25,12 @@ const shopify = shopifyApp({
       currencyCode: 'USD',
       replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
     },
+    'Unlimited (Yearly)': {
+      interval: BillingInterval.Annual,
+      amount: 60,
+      currencyCode: 'USD',
+      replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
+    },
   },
   future: {
     unstable_newEmbeddedAuthStrategy: true,

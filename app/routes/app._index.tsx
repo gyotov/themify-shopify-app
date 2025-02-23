@@ -447,36 +447,40 @@ export default function Index() {
               <Card>
                 <BlockStack gap="300">
                   <Text as="p" variant="headingMd">
-                    Plan & Scheduling Info
+                    Summary
                   </Text>
 
                   <Text as="p" variant="bodyMd">
                     {"Current plan: "}
                     <Text as="strong" variant="headingSm">
-                      {data.hasActivePayment ? "Pro" : "Free"}
+                      {data.hasActivePayment ? "Unlimited" : "Free demo"}
                     </Text>
                   </Text>
 
-                  <Text as="p" variant="bodyMd">
-                    {"Performed schedules: "}
-                    <Text as="strong" variant="headingSm">
-                      {data.scheduleCount}
-                    </Text>
-                  </Text>
+                  {!data.hasActivePayment && (
+                    <>
+                      <Text as="p" variant="bodyMd">
+                        {"Performed schedules: "}
+                        <Text as="strong" variant="headingSm">
+                          {data.scheduleCount}
+                        </Text>
+                      </Text>
 
-                  <Text as="p" variant="bodyMd">
-                    {"Available schedules: "}
-                    <Text as="strong" variant="headingSm">
-                      {data.hasActivePayment
-                        ? "Unlimited"
-                        : FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount}
-                    </Text>
-                  </Text>
+                      <Text as="p" variant="bodyMd">
+                        {"Available schedules: "}
+                        <Text as="strong" variant="headingSm">
+                          {data.hasActivePayment
+                            ? "Unlimited"
+                            : FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount}
+                        </Text>
+                      </Text>
 
-                  <Text as="p" variant="bodyMd">
-                    Upgrade to unlock unlimited scheduling.{" "}
-                    <Link url="/app/billing">Upgrade</Link>
-                  </Text>
+                      <Text as="p" variant="bodyMd">
+                        Upgrade to unlock unlimited scheduling.{" "}
+                        <Link url="/app/billing">Upgrade</Link>
+                      </Text>
+                    </>
+                  )}
                 </BlockStack>
               </Card>
             </Layout.Section>

@@ -5,8 +5,10 @@ import {
   Text,
   Divider,
   BlockStack,
+  InlineStack,
   List,
   Button,
+  Badge,
 } from "@shopify/polaris";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -20,7 +22,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     isTest: process.env.NODE_ENV !== "production",
   });
 
-  return { hasActivePayment: payments.hasActivePayment };
+  return {
+    hasActivePayment: payments.hasActivePayment,
+    appSubscription: payments.appSubscriptions[0] || null,
+  };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -74,7 +79,7 @@ export default function AdditionalPage() {
     >
       <Layout>
         <Layout.Section variant="oneThird">
-          <Card padding="600">
+          <Card>
             <BlockStack gap="300">
               <Text as="h2" variant="headingLg">
                 Free demo
@@ -120,15 +125,6 @@ export default function AdditionalPage() {
               >
                 Free
               </Button>
-
-              <Text
-                as="span"
-                variant="bodyLg"
-                tone="subdued"
-                alignment="center"
-              >
-                {data.hasActivePayment ? "DOWNGRADE PLAN" : "CURRENT PLAN"}
-              </Text>
             </BlockStack>
           </Card>
         </Layout.Section>
@@ -182,25 +178,73 @@ export default function AdditionalPage() {
                   setPlanSelected(true);
                   fetcher.submit({ plan: "Unlimited" }, { method: "POST" });
                 }}
-                disabled={data.hasActivePayment}
+                disabled={data.hasActivePayment && data.appSubscription.name === "Unlimited"}
                 loading={planSelected}
               >
-                Upgrade
+                Upgrade monthly
               </Button>
-
-              <Text
-                as="span"
-                variant="bodyLg"
-                tone="subdued"
-                alignment="center"
-              >
-                {data.hasActivePayment ? "CURRENT PLAN" : "UPGRADE PLAN"}
-              </Text>
             </BlockStack>
           </Card>
         </Layout.Section>
 
         <Layout.Section variant="oneThird">
+          <Card>
+            <BlockStack gap="300">
+              <InlineStack align="space-between" blockAlign="center" gap="200">
+                <Text as="h2" variant="headingLg">
+                  Unlimited (Yearly)
+                </Text>
+
+                <Badge tone="success-strong">Save 16%</Badge>
+              </InlineStack>
+
+              <Divider />
+
+              <Text as="p" tone="subdued">
+                💎 Enjoy unlimited theme scheduling and the flexibility to
+                manage your store themes with ease—now with 16% savings on the
+                yearly plan!
+              </Text>
+
+              <List>
+                <List.Item>
+                  All from <Text as="strong">Unlimited</Text>
+                </List.Item>
+
+                <List.Item>
+                  <Text as="span" tone="success">
+                    Save 16% on yearly subscription
+                  </Text>
+                </List.Item>
+              </List>
+
+              <Text as="p" variant="heading2xl">
+                $60{" "}
+                <Text as="span" variant="bodyMd" tone="subdued">
+                  / year
+                </Text>
+              </Text>
+
+              <Button
+                variant="primary"
+                size="large"
+                onClick={() => {
+                  setPlanSelected(true);
+                  fetcher.submit(
+                    { plan: "Unlimited (Yearly)" },
+                    { method: "POST" },
+                  );
+                }}
+                disabled={data.hasActivePayment && data.appSubscription.name === "Unlimited (Yearly)"}
+                loading={planSelected}
+              >
+                Upgrade yearly
+              </Button>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+
+        {/* <Layout.Section variant="oneThird">
           <Card>
             <BlockStack gap="300">
               <Text as="h2" variant="headingLg">
@@ -239,7 +283,7 @@ export default function AdditionalPage() {
               </Text>
             </BlockStack>
           </Card>
-        </Layout.Section>
+        </Layout.Section> */}
       </Layout>
     </Page>
   );
