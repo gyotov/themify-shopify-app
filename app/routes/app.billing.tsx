@@ -9,8 +9,11 @@ import {
   List,
   Button,
   Badge,
+  Box,
+  Banner,
 } from "@shopify/polaris";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Modal, TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
@@ -63,6 +66,7 @@ export default function AdditionalPage() {
   const data = useLoaderData();
   const fetcher = useFetcher<typeof action>();
   const [planSelected, setPlanSelected] = useState(false);
+  const shopify = useAppBridge();
 
   useEffect(() => {
     setPlanSelected(false);
@@ -119,13 +123,55 @@ export default function AdditionalPage() {
                 loading={planSelected}
                 size="large"
                 onClick={() => {
-                  setPlanSelected(true);
-                  fetcher.submit({ cancel: true }, { method: "POST" });
+                  shopify.modal.show("app-rest-plan-modal");
                 }}
               >
                 Free
               </Button>
             </BlockStack>
+
+            <Modal id="app-rest-plan-modal">
+              <Box padding="500">
+                <BlockStack gap="300">
+                  <Banner tone="warning">
+                    <Text as="p">
+                      Are you sure you want to cancel your{" "}
+                      {data?.appSubscription?.name} subscription?
+                      <List>
+                        <List.Item>
+                          After cancellation, you will be downgraded to the Free
+                          Plan, which allows only 3 scheduled publications
+                          immediately.
+                        </List.Item>
+
+                        <List.Item>This action cannot be undone.</List.Item>
+                      </List>
+                    </Text>
+                  </Banner>
+                </BlockStack>
+              </Box>
+
+              <TitleBar title={"Cancel subscription & return to free plan"}>
+                <button
+                  variant="primary"
+                  onClick={() => {
+                    setPlanSelected(true);
+                    fetcher.submit({ cancel: true }, { method: "POST" });
+                    shopify.modal.hide("app-rest-plan-modal");
+                  }}
+                >
+                  Confirm cancellation
+                </button>
+
+                <button
+                  onClick={() => {
+                    shopify.modal.hide("app-rest-plan-modal");
+                  }}
+                >
+                  Keep my plan
+                </button>
+              </TitleBar>
+            </Modal>
           </Card>
         </Layout.Section>
 
@@ -178,7 +224,10 @@ export default function AdditionalPage() {
                   setPlanSelected(true);
                   fetcher.submit({ plan: "Unlimited" }, { method: "POST" });
                 }}
-                disabled={data.hasActivePayment && data.appSubscription.name === "Unlimited"}
+                disabled={
+                  data.hasActivePayment &&
+                  data.appSubscription.name === "Unlimited"
+                }
                 loading={planSelected}
               >
                 Upgrade monthly
@@ -235,7 +284,10 @@ export default function AdditionalPage() {
                     { method: "POST" },
                   );
                 }}
-                disabled={data.hasActivePayment && data.appSubscription.name === "Unlimited (Yearly)"}
+                disabled={
+                  data.hasActivePayment &&
+                  data.appSubscription.name === "Unlimited (Yearly)"
+                }
                 loading={planSelected}
               >
                 Upgrade yearly
