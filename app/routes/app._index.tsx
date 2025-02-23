@@ -471,7 +471,9 @@ export default function Index() {
                         <Text as="strong" variant="headingSm">
                           {data.hasActivePayment
                             ? "Unlimited"
-                            : FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount}
+                            : FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount >= 0
+                              ? FREE_PLAN_SCHEDULE_LIMIT - data.scheduleCount
+                              : 0}
                         </Text>
                       </Text>
 
