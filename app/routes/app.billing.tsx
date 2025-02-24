@@ -251,7 +251,7 @@ export default function AdditionalPage() {
 
               <Text as="p" tone="subdued">
                 💎 Enjoy unlimited theme scheduling and the flexibility to
-                manage your store themes with ease—now with 16% savings on the
+                manage your store themes with ease — now with 16% savings on the
                 yearly plan!
               </Text>
 
