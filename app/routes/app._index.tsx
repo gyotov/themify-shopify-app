@@ -398,7 +398,9 @@ export default function Index() {
                 </code>
               </Text>
               <br />
-              All schedules will be executed based on this timezone.
+              All schedules will be executed based on this timezone. <br />{" "}
+              There may be a slight shift of up to 5 minutes after your
+              scheduled time due to processing.
             </Text>
           </BlockStack>
         </Box>
