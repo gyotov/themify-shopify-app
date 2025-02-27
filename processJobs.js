@@ -26,7 +26,7 @@ export default async function processJobs() {
         log(`Publishing theme with Shopify ID: ${job.shopifyThemeId}...`);
 
         const apiCall = await fetch(
-          `${process.env.SHOPIFY_APP_URL}/theme-publish?shopifyThemeId=${job.shopifyThemeId}&shop=${job.session.shop}`,
+          `${process.env.APP_HOST}/theme-publish?shopifyThemeId=${job.shopifyThemeId}&shop=${job.session.shop}`,
         );
         const response = await apiCall.json();
 
