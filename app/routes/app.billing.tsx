@@ -196,10 +196,6 @@ export default function AdditionalPage() {
                 </List.Item>
 
                 <List.Item>
-                  Setting up theme <Text as="strong">notes</Text>
-                </List.Item>
-
-                <List.Item>
                   Priority email support for{" "}
                   <Text as="strong">quick assistance</Text>
                 </List.Item>
