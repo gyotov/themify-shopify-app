@@ -55,7 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = await admin.graphql(
     `
       query getThemes($endCursor: String, $startCursor: String) {
-        themes(${startCursor ? "last" : "first"}: ${PAGE_LIMIT}, after: $endCursor, before: $startCursor) {
+        themes(${startCursor ? "last" : "first"}: ${PAGE_LIMIT}, after: $endCursor, before: $startCursor, reverse: true) {
           nodes {
             id
             name
@@ -174,105 +174,122 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
   };
 
   return (
-    <ResourceList
-      emptyState={ThemesResourceListEmptyState}
-      items={data.themes}
-      resourceName={resourceName}
-      renderItem={(item) => {
-        const { id, name, role, processing, executeAt } = item;
-        const isLive = role === "MAIN";
-        const isScheduled = item.scheduleStatus === "PENDING";
-        const locked =
-          data.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT &&
-          !data.hasActivePayment;
+    <>
+      <Banner title="Current" tone="warning">
+        <Text as="p">
+          <Badge progress="complete" tone="success">
+            Live
+          </Badge>{" "}
+          {data.themes.find((theme) => theme.role === "MAIN").name}
+        </Text>
+      </Banner>
 
-        return (
-          <ResourceItem id={id} disabled>
-            <BlockStack gap="400">
-              <InlineStack align="space-between" blockAlign="center">
-                <InlineStack align="space-between" blockAlign="start" gap="300">
-                  <Badge
-                    tone={isLive ? "success" : undefined}
-                    progress={isLive ? "complete" : undefined}
+      <ResourceList
+        emptyState={ThemesResourceListEmptyState}
+        items={data.themes}
+        resourceName={resourceName}
+        renderItem={(item) => {
+          const { id, name, role, processing, executeAt } = item;
+          const isLive = role === "MAIN";
+          const isScheduled = item.scheduleStatus === "PENDING";
+          const locked =
+            data.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT &&
+            !data.hasActivePayment;
+
+          if (isLive) return;
+
+          return (
+            <ResourceItem id={id} disabled>
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="center">
+                  <InlineStack
+                    align="space-between"
+                    blockAlign="start"
+                    gap="300"
                   >
-                    {isLive ? "Live" : "Draft"}
-                  </Badge>
-
-                  <BlockStack align="center" gap="100">
-                    <Text
-                      variant="bodyLg"
-                      fontWeight="bold"
-                      as="h3"
-                      tone="base"
+                    <Badge
+                      tone={isLive ? "success" : undefined}
+                      progress={isLive ? "complete" : undefined}
                     >
-                      {name}
-                    </Text>
+                      {isLive ? "Live" : "Draft"}
+                    </Badge>
 
-                    {executeAt && (
-                      <Text tone="subdued" variant="bodySm" as="span">
-                        Publish on: <br /> {new Date(executeAt).toUTCString()}
+                    <BlockStack align="center" gap="100">
+                      <Text
+                        variant="bodyLg"
+                        fontWeight="bold"
+                        as="h3"
+                        tone="base"
+                      >
+                        {name}
                       </Text>
+
+                      {executeAt && (
+                        <Text tone="subdued" variant="bodySm" as="span">
+                          Publish on: <br /> {new Date(executeAt).toUTCString()}
+                        </Text>
+                      )}
+                    </BlockStack>
+                  </InlineStack>
+
+                  <InlineStack gap="400">
+                    {processing && <Badge tone="warning">Processing</Badge>}
+                    {isScheduled && <Badge tone="info">Scheduled</Badge>}
+
+                    {!isScheduled && (
+                      <Button
+                        variant="plain"
+                        disabled={isLive || processing || locked}
+                        onClick={() => onThemeScheduleHandler(item)}
+                        icon={locked ? LockIcon : undefined}
+                      >
+                        Schedule
+                      </Button>
                     )}
-                  </BlockStack>
+
+                    {isScheduled && (
+                      <Button
+                        tone="critical"
+                        disabled={isLive || processing}
+                        onClick={() => onThemeUnscheduleHandler(item)}
+                      >
+                        Unschedule
+                      </Button>
+                    )}
+                  </InlineStack>
                 </InlineStack>
-
-                <InlineStack gap="400">
-                  {processing && <Badge tone="warning">Processing</Badge>}
-                  {isScheduled && <Badge tone="info">Scheduled</Badge>}
-
-                  {!isScheduled && (
-                    <Button
-                      variant="plain"
-                      disabled={isLive || processing || locked}
-                      onClick={() => onThemeScheduleHandler(item)}
-                      icon={locked ? LockIcon : undefined}
-                    >
-                      Schedule
-                    </Button>
-                  )}
-
-                  {isScheduled && (
-                    <Button
-                      tone="critical"
-                      disabled={isLive || processing}
-                      onClick={() => onThemeUnscheduleHandler(item)}
-                    >
-                      Unschedule
-                    </Button>
-                  )}
-                </InlineStack>
-              </InlineStack>
-            </BlockStack>
-          </ResourceItem>
-        );
-      }}
-      showHeader
-      alternateTool={
-        <Button
-          variant="plain"
-          onClick={() => fetcher.submit({}, { method: "POST" })}
-        >
-          Refresh
-        </Button>
-      }
-      pagination={{
-        hasNext: data.pageInfo.hasNextPage,
-        hasPrevious: data.pageInfo.hasPreviousPage,
-        onNext: () => {
-          fetcher.submit(
-            { endCursor: data.pageInfo.endCursor },
-            { method: "POST" },
+              </BlockStack>
+            </ResourceItem>
           );
-        },
-        onPrevious: () => {
-          fetcher.submit(
-            { startCursor: data.pageInfo.startCursor },
-            { method: "POST" },
-          );
-        },
-      }}
-      loading={isLoading}
-    />
+        }}
+        showHeader
+        alternateTool={
+          <Button
+            variant="plain"
+            onClick={() => fetcher.submit({}, { method: "POST" })}
+          >
+            Refresh
+          </Button>
+        }
+        pagination={{
+          hasNext: data.pageInfo.hasNextPage,
+          hasPrevious: data.pageInfo.hasPreviousPage,
+          onNext: () => {
+            fetcher.submit(
+              { endCursor: data.pageInfo.endCursor },
+              { method: "POST" },
+            );
+          },
+          onPrevious: () => {
+            fetcher.submit(
+              { startCursor: data.pageInfo.startCursor },
+              { method: "POST" },
+            );
+          },
+        }}
+        loading={isLoading}
+      />
+    </>
   );
 };
 
