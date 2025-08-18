@@ -75,7 +75,7 @@ export default function AdditionalPage() {
             else?{" "}
             <Link
               target="_blank"
-              url="mailto:iotovvr@gmail.com?subject=Affiliate%20or%20Development%20Request&body=Please%20provide%20details%20about%20your%20request."
+              url="mailto:help.northwestdigital@gmail.com?subject=Affiliate%20or%20Development%20Request&body=Please%20provide%20details%20about%20your%20request."
             >
               Email Us
             </Link>
