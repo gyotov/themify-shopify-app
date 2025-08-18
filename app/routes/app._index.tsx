@@ -55,7 +55,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = await admin.graphql(
     `
       query getThemes($endCursor: String, $startCursor: String) {
-        themes(${startCursor ? "last" : "first"}: ${PAGE_LIMIT}, after: $endCursor, before: $startCursor, reverse: true) {
+        themes(
+          ${startCursor ? "last" : "first"}: ${PAGE_LIMIT},
+          after: $endCursor,
+          before: $startCursor,
+          reverse: true,
+          roles: [UNPUBLISHED]
+        ) {
           nodes {
             id
             name
@@ -71,6 +77,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             startCursor
           }
         }
+        liveTheme: themes(first: 1, roles: [MAIN]) {
+          nodes {
+            id
+            name
+            role
+            processing
+            createdAt
+            updatedAt
+          }
+        }
         shop {
           timezoneAbbreviation
           timezoneOffset
@@ -84,7 +100,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     },
   );
   const {
-    data: { themes, shop },
+    data: { themes, liveTheme, shop },
   } = await response.json();
 
   const records = await getThemesByIds(themes.nodes.map((node) => node.id));
@@ -102,6 +118,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         executeAt: record ? record.executeAt : null,
       };
     }),
+    liveTheme: liveTheme.nodes[0],
     shop,
     pageInfo: themes.pageInfo,
     hasActivePayment: payments.hasActivePayment,
@@ -180,7 +197,7 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
           <Badge progress="complete" tone="success">
             Live
           </Badge>{" "}
-          {data.themes.find((theme) => theme.role === "MAIN")?.name}
+          {data.liveTheme.name}
         </Text>
       </Banner>
 
