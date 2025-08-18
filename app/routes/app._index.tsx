@@ -180,7 +180,7 @@ const ThemesResourceList = ({ data, onThemeSchedule }) => {
           <Badge progress="complete" tone="success">
             Live
           </Badge>{" "}
-          {data.themes.find((theme) => theme.role === "MAIN").name}
+          {data.themes.find((theme) => theme.role === "MAIN")?.name}
         </Text>
       </Banner>
 
