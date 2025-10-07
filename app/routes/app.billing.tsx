@@ -207,7 +207,7 @@ export default function AdditionalPage() {
               </List>
 
               <Text as="p" variant="heading2xl">
-                $6{" "}
+                $14{" "}
                 <Text as="span" variant="bodyMd" tone="subdued">
                   / month
                 </Text>
@@ -240,14 +240,14 @@ export default function AdditionalPage() {
                   Unlimited (Yearly)
                 </Text>
 
-                <Badge tone="success-strong">Save 16%</Badge>
+                <Badge tone="success-strong">Save 30%</Badge>
               </InlineStack>
 
               <Divider />
 
               <Text as="p" tone="subdued">
                 💎 Enjoy unlimited theme scheduling and the flexibility to
-                manage your store themes with ease — now with 16% savings on the
+                manage your store themes with ease — now with 30% savings on the
                 yearly plan!
               </Text>
 
@@ -258,13 +258,13 @@ export default function AdditionalPage() {
 
                 <List.Item>
                   <Text as="span" tone="success">
-                    Save 16% on yearly subscription
+                    Save 30% on yearly subscription
                   </Text>
                 </List.Item>
               </List>
 
               <Text as="p" variant="heading2xl">
-                $60{" "}
+                $117{" "}
                 <Text as="span" variant="bodyMd" tone="subdued">
                   / year
                 </Text>
