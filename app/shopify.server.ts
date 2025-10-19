@@ -21,13 +21,13 @@ const shopify = shopifyApp({
   billing: {
     'Unlimited': {
       interval: BillingInterval.Every30Days,
-      amount: 14,
+      amount: 9,
       currencyCode: 'USD',
       replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
     },
     'Unlimited (Yearly)': {
       interval: BillingInterval.Annual,
-      amount: 117,
+      amount: 85,
       currencyCode: 'USD',
       replacementBehavior: BillingReplacementBehavior.ApplyImmediately,
     },

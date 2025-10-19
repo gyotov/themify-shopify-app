@@ -207,7 +207,7 @@ export default function AdditionalPage() {
               </List>
 
               <Text as="p" variant="heading2xl">
-                $14{" "}
+                $9{" "}
                 <Text as="span" variant="bodyMd" tone="subdued">
                   / month
                 </Text>
@@ -264,7 +264,7 @@ export default function AdditionalPage() {
               </List>
 
               <Text as="p" variant="heading2xl">
-                $117{" "}
+                $85{" "}
                 <Text as="span" variant="bodyMd" tone="subdued">
                   / year
                 </Text>
