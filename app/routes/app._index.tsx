@@ -332,7 +332,7 @@ const BannerAnnounceFreePlan = ({ hasActivePayment }) => {
         tone="warning"
       >
         <p>
-          Your current plan allows you to schedule publishing for up to 3 themes
+          Your current plan allows you to schedule publishing for 1 theme
           only. Upgrade to unlock unlimited scheduling and additional features.
         </p>
       </Banner>

@@ -98,7 +98,7 @@ export default function AdditionalPage() {
 
               <List>
                 <List.Item>
-                  Schedule publish for up to <Text as="strong">3 themes</Text>
+                  Schedule publish for <Text as="strong">1 theme</Text>
                 </List.Item>
 
                 <List.Item>

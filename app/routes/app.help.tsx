@@ -46,7 +46,7 @@ export default function AdditionalPage() {
                   {
                     term: "What happens if I reach my plan limit?",
                     description:
-                      "On the Free plan, you can only schedule up to 3 themes. Upgrade to the Unlimited plan to schedule more themes.",
+                      "On the Free plan, you can only schedule 1 theme. Upgrade to the Unlimited plan to schedule more themes.",
                   },
                   {
                     term: "How do I upgrade my plan?",
