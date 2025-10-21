@@ -1,5 +1,6 @@
 import prisma from "./app/db.server.js";
 import { log } from "./app/utils/helpers.js";
+import { FREE_PLAN_SCHEDULE_LIMIT } from "./app/utils/constants.js";
 
 export default async function processJobs() {
   log("Checking scheduled jobs queue...");
@@ -24,6 +25,16 @@ export default async function processJobs() {
     try {
       if (job.jobName === "schedule_theme_publish") {
         log(`Publishing theme with Shopify ID: ${job.shopifyThemeId}...`);
+
+        if (job.session.scheduleCount >= FREE_PLAN_SCHEDULE_LIMIT) {
+          log('Schedule limit reached for free plan. Terminating...');
+
+          await prisma.scheduledJob.delete({
+            where: { id: job.id },
+          });
+
+          return;
+        }
 
         const apiCall = await fetch(
           `${process.env.APP_HOST}/theme-publish?shopifyThemeId=${job.shopifyThemeId}&shop=${job.session.shop}`,
